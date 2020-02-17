@@ -39,7 +39,7 @@ const Signup = ()=>{
     },[pw])
 
     useEffect(()=>{
-        if(me.id){
+        if(me){
             Router.push('/')
         }
     },[me && me.id])

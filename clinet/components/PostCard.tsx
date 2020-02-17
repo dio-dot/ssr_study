@@ -4,6 +4,7 @@ import { useInput } from "../utils/common";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../reducers";
 import { addCommentRequest } from "../reducers/post";
+import Link from "next/link";
 interface PostCardProps {
   post: Post;
 }
@@ -33,7 +34,21 @@ const PostCard = ({ post }: PostCardProps) => {
           <Icon type="ellipsis" key="ellipsis" />
         ]}
         extra={<Button>Follow</Button>}
-      ></Card>
+      >
+        <Card.Meta
+          avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
+          title={post.User.nickname}
+          description={<div>{
+            post.content.split(/(#[^\s]+)/g).map((v) => {
+            if (v.match(/(#[^\s]+)/g)) {
+              return (
+                <Link href='/hashtag' key={v}><a>{v}</a></Link>
+              )
+            }
+            return v;
+          })}</div>}
+        />
+      </Card>
       {commentForm && (
         <>
           <Form onSubmit={onSubmitComment}>

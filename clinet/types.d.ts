@@ -5,7 +5,7 @@ type Post =  {
             id:string,
             nickname:string
         },
-        cotent:string,
+        content:string,
         img:string,
         Comments?:Array<any>
 }

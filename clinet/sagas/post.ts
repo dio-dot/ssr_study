@@ -1,5 +1,5 @@
 import { all, fork, takeLatest, put ,delay,call} from "redux-saga/effects";
-import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure } from "../reducers/post";
+import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess } from "../reducers/post";
 import axios from "axios";
 
 function* addPost(action){
@@ -34,9 +34,27 @@ function* watchAddComment(){
     // yield takeLatest('ADD_COMMENT_REQUEST',addComment)
 }
 
+function* watchLoadPosts(){
+    yield takeLatest(loadMainPostRequest().type,loadMainPosts);
+}
+
+function* loadMainPosts(){
+    try {
+        const result = yield call(loadMainPostAPI)
+        yield put(loadMainPostSuccess(result.data));
+    } catch (error) {
+        yield put(loadMainPostFailure())
+    }
+}
+
+function loadMainPostAPI(){
+    return axios.get('http://localhost:8080/api/posts');
+}
+
 export default function* postSaga(){
     yield all([
         fork(watchAddPost),
+        fork(watchLoadPosts),
         fork(watchAddComment),
     ])
 }
