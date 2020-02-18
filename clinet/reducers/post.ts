@@ -67,7 +67,7 @@ const reducer = (state:PostState = initialState,action:PostAction)=>{
                 ...state,
                 addingPost:false,
                 addedPost:true,
-                mainPosts:[...state.mainPosts,action.payload]
+                mainPosts:[action.payload,...state.mainPosts]
             }
         }
         case ADD_POST_FAILURE:{

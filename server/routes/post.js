@@ -22,9 +22,13 @@ router.post("/", async (req, res, next) => {
       );
       await newPost.addHashtags(result.map(r => r[0]));
     }
-    const User = await newPost.getUser();
-    newPost.User = User;
-    res.json(newPost);
+    const fullPost = await db.Post.findOne({
+      where:{id:newPost.id},
+      include:[{
+        model:db.User
+      }]
+    })
+    res.json(fullPost);
 
   } catch (error) {
     console.error(error);
