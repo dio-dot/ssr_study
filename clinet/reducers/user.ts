@@ -56,7 +56,7 @@ export const signUpFailure = (payload: string) => ({
   type: SIGN_UP_FAILURE,
   payload
 });
-export const loadUserRequest = () => ({ type: LOAD_USER_REQUEST });
+export const loadUserRequest = (payload?:any) => ({ type: LOAD_USER_REQUEST });
 export const loadUserSuccess = (payload:object) => ({ type: LOAD_USER_SUCCESS ,payload });
 export const loadUserFailure = (payload:string) => ({ type: LOAD_USER_FAILURE ,payload});
 
@@ -85,6 +85,7 @@ export type UserState = {
   signUpErrorReason: string;
 
   me: any;
+  userInfo:any;
   // {
   //     id:string|undefined,
   //     nickname:string,
@@ -103,6 +104,7 @@ const initialState: UserState = {
   signingUp: false,
   signUpErrorReason: "",
   me: null,
+  userInfo:null,
 };
 
 const reducer = (state: UserState = initialState, action: UserAction) => {

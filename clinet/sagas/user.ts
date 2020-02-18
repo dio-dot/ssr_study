@@ -78,17 +78,17 @@ function* watchLoadUser() {
   yield takeLatest(loadUserRequest().type, loadUser);
 }
 
-function* loadUser() {
+function* loadUser(action) {
   try {
-    const result = yield call(loadUserAPI);
+    const result = yield call(loadUserAPI,action.payload);
     yield put(loadUserSuccess(result.data));
   } catch (error) {
     yield put(loadUserFailure(error));
   }
 }
 
-function loadUserAPI() {
-  return axios.get("http://localhost:8080/api/user", { withCredentials: true });
+function loadUserAPI(userId) {
+  return axios.get(userId?`https://localhost:8080/api/user/${userId}`:"http://localhost:8080/api/user", { withCredentials: true });
 }
 
 export default function* userSaga() {

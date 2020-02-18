@@ -9,7 +9,7 @@ import rootSaga from '../sagas';
 import {Provider} from "react-redux";
 
 
-const App = ({Component,store})=>{
+const App = ({Component,store,pageProps})=>{
     return (
         <Provider store={store}>
             <Head>
@@ -19,10 +19,20 @@ const App = ({Component,store})=>{
                 ></link>
             </Head>
             <AppLayout>
-                <Component/>
+                <Component {...pageProps}/>
             </AppLayout>
         </Provider>
     )
+}
+
+App.getInitialProps = async(context)=>{
+    console.log(context);
+    const {ctx} = context
+    let pageProps = {};
+    if(context.Component.getInitialProps){
+       pageProps =  await context.Component.getInitialProps(ctx)
+    }
+    return {pageProps};
 }
 
 export default withRedux((initialState,options)=>{
