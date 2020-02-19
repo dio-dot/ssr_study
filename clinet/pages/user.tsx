@@ -4,13 +4,16 @@ import { useEffect } from "react";
 import PostCard from "../components/PostCard";
 import { loadUserPostRequest } from "../reducers/post";
 import { Card, Avatar, Button } from "antd";
+import { loadUserRequest } from "../reducers/user";
 
-const User = ({tag}) =>{
+const User = ({user}) =>{
     const dispatch = useDispatch();
     const {mainPosts} = useSelector((state:RootState)=>state.post)
     const {userInfo} = useSelector((state:RootState)=>state.user)
     useEffect(()=>{
-        dispatch(loadUserPostRequest(tag))
+      console.log(mainPosts);
+        dispatch(loadUserRequest(user))
+        dispatch(loadUserPostRequest(user))
     },[])
     return (
         <div>
@@ -21,17 +24,17 @@ const User = ({tag}) =>{
                   <div key="twit">
                     Twit
                     <br />
-                    {userInfo.Post?userInfo.Post.length:0}
+                    {userInfo.Posts?userInfo.Posts.length:0}
                   </div>,
                   <div key="following">
                     Following
                     <br />
-                    {userInfo.Following?userInfo.Following.length:0}
+                    {userInfo.Followings?userInfo.Followings.length:0}
                   </div>,
                   <div key="follower">
                     Follower
                     <br />
-                    {userInfo.Follower?userInfo.Follower.length:0}
+                    {userInfo.Followers?userInfo.Followers.length:0}
                   </div>
                 ]}
               >
@@ -44,14 +47,14 @@ const User = ({tag}) =>{
         }
         {
             mainPosts.map(v=>{
-                <PostCard key={v.id} post={v}/>
+                return <PostCard key={v.id} post={v}/>
             })
         }
         </div>
     )
 }
 User.getInitialProps=async(context)=>{
-    console.log(`User getInitialProps`,context.query.id)
-    return {id:parseInt(context.query.id,10)}
+    console.log(`User getInitialProps`,context.query.user)
+    return {user:parseInt(context.query.user,10)}
 }
 export default User

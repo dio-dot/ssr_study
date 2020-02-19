@@ -16,7 +16,7 @@ const Home = () => {
   return (
     <>
       {me && <PostForm />}
-      {mainPosts.map((post: Post) => {
+      {mainPosts.map((post) => {
     return <PostCard key={post.id} post={post} />;
     // return <div key={post.id}>{post.content}</div>;
     })}

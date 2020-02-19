@@ -7,6 +7,7 @@ import { loadHashtagPostRequest } from "../reducers/post";
 const Hashtag = ({tag}) =>{
     const dispatch = useDispatch();
     const {mainPosts} = useSelector((state:RootState)=>state.post)
+    
     useEffect(()=>{
         dispatch(loadHashtagPostRequest(tag))
     },[])
@@ -14,7 +15,7 @@ const Hashtag = ({tag}) =>{
         <div>
         {
             mainPosts.map(v=>{
-                <PostCard key={v.id} post={v}/>
+                return <PostCard key={v.id} post={v}/>
             })
         }
         </div>

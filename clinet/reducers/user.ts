@@ -56,8 +56,8 @@ export const signUpFailure = (payload: string) => ({
   type: SIGN_UP_FAILURE,
   payload
 });
-export const loadUserRequest = (payload?:any) => ({ type: LOAD_USER_REQUEST });
-export const loadUserSuccess = (payload:object) => ({ type: LOAD_USER_SUCCESS ,payload });
+export const loadUserRequest = (payload?:any) => ({ type: LOAD_USER_REQUEST,payload });
+export const loadUserSuccess = (payload:any) => ({ type: LOAD_USER_SUCCESS ,payload });
 export const loadUserFailure = (payload:string) => ({ type: LOAD_USER_FAILURE ,payload});
 
 type UserAction =
@@ -159,10 +159,17 @@ const reducer = (state: UserState = initialState, action: UserAction) => {
         }
     }
     case LOAD_USER_SUCCESS:{
+      console.log(action.payload);
+      if(action.payload.me){
         return{
-            ...state,
-            me:action.payload
-        }
+          ...state,
+          me:action.payload.payload
+        } 
+      }
+      return{
+        ...state,
+        userInfo:action.payload.payload
+      }
     }
     case LOAD_USER_FAILURE:{
         return{

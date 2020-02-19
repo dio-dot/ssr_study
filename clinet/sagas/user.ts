@@ -12,7 +12,7 @@ import {
   loadUserSuccess,
   loadUserFailure
 } from "../reducers/user";
-import { takeLatest, all, fork, call, delay, put } from "redux-saga/effects";
+import { takeLatest, all, fork, call, delay, put ,takeEvery} from "redux-saga/effects";
 import axios from "axios";
 
 function* watchLogIn() {
@@ -75,20 +75,26 @@ function logOutAPI() {
 }
 
 function* watchLoadUser() {
-  yield takeLatest(loadUserRequest().type, loadUser);
+  yield takeEvery(loadUserRequest().type, loadUser);
 }
 
 function* loadUser(action) {
   try {
     const result = yield call(loadUserAPI,action.payload);
-    yield put(loadUserSuccess(result.data));
+    console.log(result.data);
+    const payload = {
+      payload:result.data,
+      me:!action.payload,
+    }
+    yield put(loadUserSuccess(payload));
   } catch (error) {
     yield put(loadUserFailure(error));
   }
 }
 
 function loadUserAPI(userId) {
-  return axios.get(userId?`https://localhost:8080/api/user/${userId}`:"http://localhost:8080/api/user", { withCredentials: true });
+  console.log("api request "+(userId ? `/api/user/${userId}`:"/api/user"))
+  return axios.get(userId?`http://localhost:8080/api/user/${userId}`:"http://localhost:8080/api/user", { withCredentials: true });
 }
 
 export default function* userSaga() {

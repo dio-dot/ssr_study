@@ -33,7 +33,31 @@ router.post("/", async(req, res, next) => {
         return next(error)
     }
 });
-router.get("/:id", (req, res) => {});
+router.get("/:id", async(req, res,next) => {
+    try {
+        const User = await db.User.findOne({
+            where:{id:parseInt(req.params.id,10)},
+            include:[{
+                model:db.Post,
+                as:'Posts',
+                attributes:['id']
+            },{
+                model:db.User,
+                as:'Followings',
+                attributes:['id']
+            },{
+                model:db.User,
+                as:'Followers',
+                attributes:['id']
+            }],
+            attributes:['id','nickname'],
+        })
+        res.json(User);
+    } catch (error) {
+        console.error(error);
+        next(error)
+    }
+});
 router.post("/login", (req, res,next) => {
     passport.authenticate('local',(err,user,info)=>{
         if(err){
@@ -80,7 +104,7 @@ router.get("/:id/posts", async(req, res,next) => {
     try {
         const posts = await db.Post.findAll({
             where:{
-                UserId:parseInt(req.params.id),
+                userId:parseInt(req.params.id,10),
                 RetweetId:null
             },
             include:[{

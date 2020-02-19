@@ -65,7 +65,7 @@ function* loadHashtagPosts(action){
 }
 
 function loadHashtagPostsAPI(hashtag){
-    return axios.get(`http://localhost:8080/api/posts/hashtag/${hashtag}`,)
+    return axios.get(`http://localhost:8080/api/hashtag/${hashtag}`,)
 }
 
 function* watchLoadUserPosts(){

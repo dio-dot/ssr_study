@@ -5,12 +5,12 @@ const router = express.Router();
 
 router.get('/:tag',async(req,res,next)=>{
     try {
-        const posts = await db.Posts.findAll({
+        const posts = await db.Post.findAll({
             // where:
             include:[{
                 model:db.Hashtag,
                 where:{
-                    name:decodeURIComponent(req.params.name)
+                    src:decodeURIComponent(req.params.tag)
                 }
             },
             {
@@ -19,9 +19,12 @@ router.get('/:tag',async(req,res,next)=>{
             }
             ]
         })
+        console.log(posts);
         res.json(posts);
     } catch (error) {
         console.error(error);
         next(error);
     }
 })
+
+module.exports=router;
