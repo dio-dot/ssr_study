@@ -6,14 +6,14 @@ import { loadUserPostRequest } from "../reducers/post";
 import { Card, Avatar, Button } from "antd";
 import { loadUserRequest } from "../reducers/user";
 
-const User = ({user}) =>{
+const User = ({id}) =>{
     const dispatch = useDispatch();
     const {mainPosts} = useSelector((state:RootState)=>state.post)
     const {userInfo} = useSelector((state:RootState)=>state.user)
     useEffect(()=>{
       console.log(mainPosts);
-        dispatch(loadUserRequest(user))
-        dispatch(loadUserPostRequest(user))
+        dispatch(loadUserRequest(id))
+        dispatch(loadUserPostRequest(id))
     },[])
     return (
         <div>
@@ -54,7 +54,7 @@ const User = ({user}) =>{
     )
 }
 User.getInitialProps=async(context)=>{
-    console.log(`User getInitialProps`,context.query.user)
-    return {user:parseInt(context.query.user,10)}
+    console.log(`User getInitialProps`,context.query.id)
+    return {id:parseInt(context.query.id,10)}
 }
 export default User

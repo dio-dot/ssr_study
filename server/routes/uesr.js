@@ -2,9 +2,10 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const db = require('../models');
 const passport = require('passport');
+const {isLoggedIn} = require('./middleware');
 
 const router = express.Router();
-router.get("/", (req, res) => {
+router.get("/",isLoggedIn,(req, res) => {
     if(!req.user){
         return res.status(401).send('로그인이 필요합니다.')
     }
@@ -13,7 +14,6 @@ router.get("/", (req, res) => {
     res.json(user)
 });
 router.post("/", async(req, res, next) => {
-    console.log(req);
     try {
       const exUser = await db.User.findOne({
           where:{
@@ -29,7 +29,7 @@ router.post("/", async(req, res, next) => {
       })
       return res.status(200).send(newUser);
     } catch (error) {
-        console.log(error)
+        console.error(error)
         return next(error)
     }
 });

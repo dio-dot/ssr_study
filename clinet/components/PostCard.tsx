@@ -3,7 +3,7 @@ import { useCallback, useState, FormEvent, ChangeEvent } from "react";
 import { useInput } from "../utils/common";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../reducers";
-import { addCommentRequest } from "../reducers/post";
+import { addCommentRequest ,loadCommentsRequest} from "../reducers/post";
 import Link from "next/link";
 import Item from "antd/lib/list/Item";
 // interface PostCardProps {
@@ -26,14 +26,18 @@ const PostCard = ({ post }) => {
   const [commentForm, setCommentForm] = useState(false);
   const [comment, onChangeComment] = useInput("");
   const { addingComment } = useSelector((state: RootState) => state.post);
+  const { me } = useSelector((state:RootState)=>state.user)
   const dispatch = useDispatch();
   const onToggleComment = useCallback(() => {
     setCommentForm(!commentForm);
+    if(!commentForm){
+      dispatch(loadCommentsRequest(post.id));
+    }
   }, [commentForm]);
   const onSubmitComment = useCallback((e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(addCommentRequest(post.id));
-  }, []);
+    dispatch(addCommentRequest({id:post.id,content:comment}));
+  }, [me && me.id ,comment ]);
 
   return (
     <div>
@@ -49,13 +53,13 @@ const PostCard = ({ post }) => {
         extra={<Button>Follow</Button>}
       >
         <Card.Meta
-          avatar={<Link href={`/user/${post.User.id}`}><a><Avatar>{post.User.nickname[0]}</Avatar></a></Link>}
+          avatar={<Link href={{ pathname:'/user', query:{id:post.User.id} }} as={`/user/${post.User.id}`}><a><Avatar>{post.User.nickname[0]}</Avatar></a></Link>}
           title={post.User.nickname}
           description={<div>{
             post.content.split(/(#[^\s]+)/g).map((v) => {
             if (v.match(/(#[^\s]+)/g)) {
               return (
-                <Link href={`/hashtag/${v.slice(1)}`} key={v}><a>{v}</a></Link>
+                <Link href={{ pathname:'/hashtag', query:{tag:v.slice(1)} }} as={`/hashtag/${v.slice(1)}`} key={v}><a>{v}</a></Link>
               )
             }
             return v;
@@ -79,29 +83,17 @@ const PostCard = ({ post }) => {
           <List
             header={`${post.Comments ? post.Comments.length : 0} comment`}
             itemLayout="horizontal"
-            // dataSource={post.Comments || []}
-            // renderItem={item => (
-            //   <li>
-            //     <Comment
-            //       author={item.User.nickname}
-            //       avatar={<Avatar>{item.User.nickname[0]}</Avatar>}
-            //       content={item.content}
-            //       datetime={item.createdAt}
-            //     />
-            //   </li>
-            // )}
-              renderItem={
-                post.Comments.map(v=>{
-                  return (
-                    <Comment
-                      author={v.User.nickname}
-                      avatar={<Link href={`/user/${v.User.id}`}><a><Avatar>{v.User.nickname[0]}</Avatar></a></Link>}
-                      content={v.User.content}
-                      datetime={v.User.createdAt}
-                    />
-                  )
-                })
-              }
+            dataSource={post.Comments || []}
+            renderItem={(item:any) => (
+              <li>
+                <Comment
+                  author={item.User.nickname}
+                  avatar={<Link href={{pathname:`/user` ,query:{id:item.User.id} }} as={`/user/${item.User.id}`}><a><Avatar>{item.User.nickname[0]}</Avatar></a></Link>}
+                  content={item.content}
+                  datetime={item.createdAt}
+                />
+              </li>
+            )}
           />
         </>
       )}

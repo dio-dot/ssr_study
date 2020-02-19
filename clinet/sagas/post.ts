@@ -1,9 +1,8 @@
 import { all, fork, takeLatest, put ,delay,call} from "redux-saga/effects";
-import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest } from "../reducers/post";
+import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess } from "../reducers/post";
 import axios from "axios";
 
 function* addPost(action){
-    console.log(action);
     try {
         const result = yield call(addPostAPI,action.payload)
         yield put(addPostSuccess(result.data));
@@ -16,15 +15,21 @@ function* watchAddPost(){
     yield takeLatest(addPostRequest().type,addPost)
 }
 
-function addPostAPI(postData){
-    return axios.post('http://localhost:8080/api/post',postData,{withCredentials:true})
+function addPostAPI(data){
+    return axios.post('http://localhost:8080/api/post',data,{withCredentials:true})
+}
+
+function addCommentAPI(data){
+    return axios.post(`http://localhost:8080/api/post/${data.id}/comment`,{content:data.content},{withCredentials:true})
 }
 
 function* addComment(action){
     try {
-        yield delay(100);
-        yield put(addCommentSuccess(action.payload));
+        // yield delay(200);
+        const result = yield call(addCommentAPI,action.payload)
+        yield put(addCommentSuccess(result.data));
     } catch (error) {
+        console.error(error)
         yield put(addCommentFailure(error));
     }
 }
@@ -32,6 +37,22 @@ function* addComment(action){
 function* watchAddComment(){
     yield takeLatest(addCommentRequest().type,addComment)
     // yield takeLatest('ADD_COMMENT_REQUEST',addComment)
+}
+
+function* watchLoadComments(){
+    yield takeLatest(loadCommentsRequest().type,loadComments)
+}
+
+function* loadComments(action){
+    try {
+        const result = yield call(loadCommentsAPI,action.payload);
+        yield put(loadCommentsSuccess({postId:action.payload,comments:result.data}));
+    } catch (error) {
+        yield put(loadCommentsFailure())
+    }
+}
+function loadCommentsAPI(id){
+    return axios.get(`http://localhost:8080/api/post/${id}/comments`);
 }
 
 function* watchLoadPosts(){
@@ -90,6 +111,7 @@ export default function* postSaga(){
         fork(watchAddPost),
         fork(watchLoadPosts),
         fork(watchAddComment),
+        fork(watchLoadComments),
         fork(watchLoadHashtagPosts),
         fork(watchLoadUserPosts)
     ])
