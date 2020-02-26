@@ -24,6 +24,20 @@ const LOAD_COMMENTS_REQUEST = 'LOAD_COMMENTS_REQUEST' as const
 const LOAD_COMMENTS_SUCCESS = 'LOAD_COMMENTS_SUCCESS' as const
 const LOAD_COMMENTS_FAILURE = 'LOAD_COMMENTS_FAILURE' as const
 
+const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST' as const
+const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS' as const
+const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE' as const
+
+const REMOVE_IMAGE = 'REMOVE_IMAGE' as const;
+
+const LIKE_POST_REQUEST = 'LIKE_POST_REQUEST' as const;
+const LIKE_POST_SUCCESS = 'LIKE_POST_SUCCESS' as const;
+const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE' as const;
+
+const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST' as const;
+const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS' as const;
+const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE' as const;
+
 export const addPostRequest = (payload?:object)=>({type:ADD_POST_REQUEST,payload})
 export const addPostSuccess = (payload:any)=>({type:ADD_POST_SUCCESS,payload})
 export const addPostFailure = (payload:string)=>({type:ADD_POST_FAILURE,payload})
@@ -42,7 +56,16 @@ export const loadUserPostFailure = ()=>({type:LOAD_USER_POST_FAILURE})
 export const loadCommentsRequest = (payload?:number)=>({type:LOAD_COMMENTS_REQUEST,payload})
 export const loadCommentsSuccess = (payload:any)=>({type:LOAD_COMMENTS_SUCCESS,payload})
 export const loadCommentsFailure = ()=>({type:LOAD_COMMENTS_FAILURE})
-
+export const uploadImagesRequest = (payload?:any)=>({type:UPLOAD_IMAGES_REQUEST,payload})
+export const uploadImagesSuccess = (payload?:any)=>({type:UPLOAD_IMAGES_SUCCESS,payload})
+export const uploadImagesFailure = ()=>({type:UPLOAD_IMAGES_FAILURE})
+export const removeImage = (payload?:any)=>({type:REMOVE_IMAGE,payload})
+export const likePostRequest = (payload?:any) =>({type:LIKE_POST_REQUEST,payload})
+export const likePostSuccess = (payload:any) =>({type:LIKE_POST_SUCCESS,payload})
+export const likePostFailure = ()=>({type:LIKE_POST_FAILURE})
+export const unlikePostRequest = (payload?:any) =>({type:UNLIKE_POST_REQUEST,payload})
+export const unlikePostSuccess = (payload:any) =>({type:UNLIKE_POST_SUCCESS,payload})
+export const unlikePostFailure = ()=>({type:UNLIKE_POST_FAILURE})
 
 type PostAction = 
 ReturnType<typeof addCommentRequest>|
@@ -62,11 +85,21 @@ ReturnType<typeof loadUserPostSuccess>|
 ReturnType<typeof loadUserPostFailure>|
 ReturnType<typeof loadCommentsRequest>|
 ReturnType<typeof loadCommentsSuccess>|
-ReturnType<typeof loadCommentsFailure>
+ReturnType<typeof loadCommentsFailure>|
+ReturnType<typeof uploadImagesRequest>|
+ReturnType<typeof uploadImagesSuccess>|
+ReturnType<typeof uploadImagesFailure>|
+ReturnType<typeof removeImage>|
+ReturnType<typeof likePostRequest>|
+ReturnType<typeof likePostSuccess>|
+ReturnType<typeof likePostFailure>|
+ReturnType<typeof unlikePostRequest>|
+ReturnType<typeof unlikePostSuccess>|
+ReturnType<typeof unlikePostFailure>
 
 type PostState = {
     mainPosts:Array<Post>,
-    imagePaths?:Array<string>,
+    imagePaths:Array<any>,
     addPostErrorReason:string,
     addingPost:boolean,
     addedPost:boolean,
@@ -82,7 +115,8 @@ const initialState:PostState = {
     addPostErrorReason:"",
     addingComment:false,
     addedComment:false,
-    mainPosts:[]
+    mainPosts:[],
+    imagePaths:[],
 }
 
 const reducer = (state:PostState = initialState,action:PostAction)=>{
@@ -100,7 +134,8 @@ const reducer = (state:PostState = initialState,action:PostAction)=>{
                 ...state,
                 addingPost:false,
                 addedPost:true,
-                mainPosts:[action.payload,...state.mainPosts]
+                mainPosts:[action.payload,...state.mainPosts],
+                imagePaths:[]
             }
         }
         case ADD_POST_FAILURE:{
@@ -203,6 +238,70 @@ const reducer = (state:PostState = initialState,action:PostAction)=>{
             }
         }
         case LOAD_COMMENTS_FAILURE:{
+            return{
+                ...state
+            }
+        }
+        case UPLOAD_IMAGES_REQUEST:{
+            return{
+                ...state,
+            }
+        }
+        case UPLOAD_IMAGES_SUCCESS:{
+            return{
+                ...state,
+                imagePaths:[...state.imagePaths,...action.payload]
+            }
+        }
+        case REMOVE_IMAGE:{
+            return{
+                ...state,
+                imagePaths:state.imagePaths.filter((v,i)=>i!==action.payload)
+            }
+        }
+        case UPLOAD_IMAGES_FAILURE:{
+            return{
+                ...state
+            }
+        }
+        case LIKE_POST_REQUEST:{
+            return{
+                ...state
+            }
+        }
+        case LIKE_POST_SUCCESS:{
+            const postIndex = state.mainPosts.findIndex(v=>v.id ===action.payload.postId)
+            const post = state.mainPosts[postIndex];
+            const Likers = [{id:action.payload.userId},...post.Likers];
+            const mainPosts = [...state.mainPosts];
+            mainPosts[postIndex] = {...post,Likers};
+            return{
+                ...state,
+                mainPosts
+            }
+        }
+        case LIKE_POST_FAILURE:{
+            return{
+                ...state
+            }
+        }
+        case UNLIKE_POST_REQUEST:{
+            return{
+                ...state
+            }
+        }
+        case UNLIKE_POST_SUCCESS:{
+            const postIndex = state.mainPosts.findIndex(v=>v.id ===action.payload.postId)
+            const post = state.mainPosts[postIndex];
+            const Likers = post.Likers.filter(v=>v.id!==action.payload.userId);
+            const mainPosts = [...state.mainPosts];
+            mainPosts[postIndex] = {...post,Likers};
+            return{
+                ...state,
+                mainPosts
+            }
+        }
+        case UNLIKE_POST_FAILURE:{
             return{
                 ...state
             }

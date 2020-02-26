@@ -1,5 +1,5 @@
 import { all, fork, takeLatest, put ,delay,call} from "redux-saga/effects";
-import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess } from "../reducers/post";
+import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess } from "../reducers/post";
 import axios from "axios";
 
 function* addPost(action){
@@ -106,6 +106,74 @@ function loadUserPostsAPI(userId){
     return axios.get(`http://localhost:8080/api/user/${userId}/posts`,{})
 }
 
+function* watchUploadImages(){
+    yield takeLatest(uploadImagesRequest().type,uploadImages);
+}
+
+function* uploadImages(action){
+    try {
+        const result = yield call(uploadIamgesAPI,action.payload)
+        yield put(uploadImagesSuccess(
+            result.data
+        ));
+    } catch (error) {
+        console.error(error);
+        yield put(uploadImagesFailure());
+    }
+}
+
+function uploadIamgesAPI(images){
+    return axios.post(`http://localhost:8080/api/post/images`,images,{
+        withCredentials:true,
+    })
+}
+
+function* watchLikePost(){
+    yield takeLatest(likePostRequest().type,LikePost)
+}
+
+function* LikePost(action){
+    try {
+        const result = yield call(LikePostAPI,action.payload) 
+        yield put(likePostSuccess({
+            userId:result.data.userId,
+            postId:action.payload
+        }))
+    } catch (error) {
+        yield put(likePostFailure())
+    }
+}
+
+function LikePostAPI(postId){
+    return axios.post(`http://localhost:8080/api/post/${postId}/like`,{},{
+        withCredentials:true,
+    })
+}
+
+function* watchUnlikePost(){
+    yield takeLatest(unlikePostRequest().type,unlikePost)
+}
+
+function* unlikePost(action){
+    try {
+        const result = yield call(unlikePostAPI,action.payload) 
+        yield put(unlikePostSuccess(
+            {
+                userId:result.data.userId,
+                postId:action.payload
+            }
+        ))
+    } catch (error) {
+        yield put(unlikePostFailure())
+    }
+}
+
+function unlikePostAPI(postId){
+    return axios.delete(`http://localhost:8080/api/post/${postId}/like`,{
+        withCredentials:true,
+    })    
+}
+
 export default function* postSaga(){
     yield all([
         fork(watchAddPost),
@@ -113,6 +181,9 @@ export default function* postSaga(){
         fork(watchAddComment),
         fork(watchLoadComments),
         fork(watchLoadHashtagPosts),
-        fork(watchLoadUserPosts)
+        fork(watchLoadUserPosts),
+        fork(watchUploadImages),
+        fork(watchLikePost),
+        fork(watchUnlikePost),
     ])
 }

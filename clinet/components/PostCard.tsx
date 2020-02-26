@@ -3,9 +3,10 @@ import { useCallback, useState, FormEvent, ChangeEvent } from "react";
 import { useInput } from "../utils/common";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../reducers";
-import { addCommentRequest ,loadCommentsRequest} from "../reducers/post";
+import { addCommentRequest ,loadCommentsRequest, unlikePostRequest, likePostRequest} from "../reducers/post";
 import Link from "next/link";
 import Item from "antd/lib/list/Item";
+import PostImages from "./PostIamges";
 // interface PostCardProps {
 //   post: Post;
 // }
@@ -28,6 +29,7 @@ const PostCard = ({ post }) => {
   const { addingComment } = useSelector((state: RootState) => state.post);
   const { me } = useSelector((state:RootState)=>state.user)
   const dispatch = useDispatch();
+  const liked= me && post.Likers && post.Likers.find(v=>v.id===me.id);
   const onToggleComment = useCallback(() => {
     setCommentForm(!commentForm);
     if(!commentForm){
@@ -38,15 +40,25 @@ const PostCard = ({ post }) => {
     e.preventDefault();
     dispatch(addCommentRequest({id:post.id,content:comment}));
   }, [me && me.id ,comment ]);
-
+  const onToggleLike = useCallback(()=>{
+    if(!me){
+      return alert('로그인이 필요합니다.');
+    }
+    if(liked){
+      dispatch(unlikePostRequest(post.id))
+    }else{
+      dispatch(likePostRequest(post.id))
+    }
+  },[me && me.id,liked])
   return (
     <div>
       <Card
         key={post.createdAt}
-        cover={post.img && <img alt="example" src={post.img} />}
+        // cover={post.Images[0] && <img alt="example" src={`http://localhost:8080/${post.Images[0].src}`} />}
+        cover={post.Images[0] && <PostImages images = {post.Images} />}
         actions={[
           <Icon type="retweet" key="retweet" />,
-          <Icon type="heart" key="heart" />,
+          <Icon type="heart" key="heart" theme={liked?"twoTone":"outlined"} twoToneColor="#eb2f96" onClick={onToggleLike} />,
           <Icon type="message" key="message" onClick={onToggleComment} />,
           <Icon type="ellipsis" key="ellipsis" />
         ]}
