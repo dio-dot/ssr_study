@@ -12,7 +12,7 @@ module.exports = () =>{
             const user = await db.User.findOne({
                 where:{
                     userId
-                }
+                },
             })
             if(!user){
                 return done(null,false,{reason:'존재하지않는 사용자 입니다.'});

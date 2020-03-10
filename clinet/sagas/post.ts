@@ -1,11 +1,13 @@
 import { all, fork, takeLatest, put ,delay,call} from "redux-saga/effects";
-import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess } from "../reducers/post";
+import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess, retweetSuccess, retweetFailure, retweetRequest } from "../reducers/post";
 import axios from "axios";
+import { addPostToMe } from "../reducers/user";
 
 function* addPost(action){
     try {
         const result = yield call(addPostAPI,action.payload)
         yield put(addPostSuccess(result.data));
+        yield put(addPostToMe(result.data.id));
     } catch (error) {
         yield put(addPostFailure(error));
     }
@@ -174,6 +176,27 @@ function unlikePostAPI(postId){
     })    
 }
 
+function* watchRetweet(){
+    yield takeLatest(retweetRequest().type,retweet)
+}
+
+function* retweet(action){
+    try {
+        const result = yield call(retweetAPI,action.payload) 
+        yield put(retweetSuccess(result.data))
+    } catch (error) {
+        console.error(error);
+        yield put(retweetFailure())
+    }
+}
+
+function retweetAPI(postId){
+    return axios.post(`http://localhost:8080/api/post/${postId}/retweet`,{},{
+        withCredentials:true,
+    })    
+}
+
+
 export default function* postSaga(){
     yield all([
         fork(watchAddPost),
@@ -185,5 +208,6 @@ export default function* postSaga(){
         fork(watchUploadImages),
         fork(watchLikePost),
         fork(watchUnlikePost),
+        fork(watchRetweet)
     ])
 }

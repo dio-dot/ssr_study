@@ -22,17 +22,17 @@ const UserProfile = () => {
         <div key="twit">
           Twit
           <br />
-          {me.Post?me.Post.length:0}
+          {me.Posts?me.Posts.length:0}
         </div>,
         <div key="following">
           Following
           <br />
-          {me.Following?me.Following.length:0}
+          {me.Followings?me.Followings.length:0}
         </div>,
         <div key="follower">
           Follower
           <br />
-          {me.Follower?me.Follower.length:0}
+          {me.Followers?me.Followers.length:0}
         </div>
       ]}
     >
