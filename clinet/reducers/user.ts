@@ -35,11 +35,11 @@ const REMOVE_FOLLOWER_SUCCESS = "REMOVE_FOLLOWER_SUCCESS" as const;
 const REMOVE_FOLLOWER_FAILURE = "REMOVE_FOLLOWER_FAILURE" as const;
 
 const ADD_POST_TO_ME = "ADD_POST_TO_ME" as const;
+const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME' as const;
 
 const EDIT_NICKNAME_REQUEST = "EDIT_NICKNAME_REQUEST" as const;
 const EDIT_NICKNAME_SUCCESS = "EDIT_NICKNAME_SUCCESS" as const;
 const EDIT_NICKNAME_FAILURE = "EDIT_NICKNAME_FAILURE" as const;
-
 export const loginRequest = (payload?: object) => ({
   type: LOG_IN_REQUEST,
   payload
@@ -76,11 +76,11 @@ export const unfollowRequest = (payload?:any)=>({type:UNFOLLOW_USER_REQUEST,payl
 export const unfollowSuccess = (payload?:any)=>({type:UNFOLLOW_USER_SUCCESS,payload});
 export const unfollowFailure = ()=>({type:UNFOLLOW_USER_FAILURE});
 
-export const loadFollowersRequest = (payload?:any)=>({type:LOAD_FOLLOWERS_REQUEST,payload});
+export const loadFollowersRequest = (payload?:any,offset?:any)=>({type:LOAD_FOLLOWERS_REQUEST,payload});
 export const loadFollowersSuccess = (payload?:any)=>({type:LOAD_FOLLOWERS_SUCCESS,payload});
 export const loadFollowersFailure = (payload?:any)=>({type:LOAD_FOLLOWERS_FAILURE,payload});
 
-export const loadFollowingsRequest = (payload?:any)=>({type:LOAD_FOLLOWINGS_REQUEST,payload});
+export const loadFollowingsRequest = (payload?:any,offset?:any)=>({type:LOAD_FOLLOWINGS_REQUEST,payload,offset});
 export const loadFollowingsSuccess = (payload?:any)=>({type:LOAD_FOLLOWINGS_SUCCESS,payload});
 export const loadFollowingsFailure = (payload?:any)=>({type:LOAD_FOLLOWINGS_FAILURE,payload});
 
@@ -89,6 +89,7 @@ export const removeFollowerSuccess = (payload?:any)=>({type:REMOVE_FOLLOWER_SUCC
 export const removeFollowerFailure = (payload?:any)=>({type:REMOVE_FOLLOWER_FAILURE,payload});
 
 export const addPostToMe = (payload:any) => ({type:ADD_POST_TO_ME,payload});
+export const removePostOfMe = (payload:any)=>({type:REMOVE_POST_OF_ME,payload}); 
 
 export const editNicknameRequest = (payload?:any) => ({type:EDIT_NICKNAME_REQUEST,payload});
 export const editNicknameSuccess = (payload:any) =>({type:EDIT_NICKNAME_SUCCESS,payload});
@@ -114,6 +115,7 @@ type UserAction =
   | ReturnType<typeof unfollowSuccess>
   | ReturnType<typeof unfollowFailure>
   | ReturnType<typeof addPostToMe>
+  | ReturnType<typeof removePostOfMe>
   | ReturnType<typeof loadFollowersRequest>
   | ReturnType<typeof loadFollowersSuccess>
   | ReturnType<typeof loadFollowersFailure>
@@ -279,7 +281,7 @@ const reducer = (state: UserState = initialState, action: UserAction) => {
     case LOAD_FOLLOWERS_SUCCESS: {
       return {
         ...state,
-        followerList:action.payload
+        followerList:state.followerList?state.followerList.concat(action.payload):action.payload
       };
     }
     case LOAD_FOLLOWERS_FAILURE: {
@@ -295,7 +297,7 @@ const reducer = (state: UserState = initialState, action: UserAction) => {
     case LOAD_FOLLOWINGS_SUCCESS: {
       return {
         ...state,
-        followingList:action.payload,
+        followingList:state.followingList?state.followingList.concat(action.payload):action.payload
       };
     }
     case LOAD_FOLLOWINGS_FAILURE: {
@@ -330,6 +332,15 @@ const reducer = (state: UserState = initialState, action: UserAction) => {
         me:{
           ...state.me,
           Posts:[...state.me.Posts,{"id":action.payload}]
+        }
+      }
+    }
+    case REMOVE_POST_OF_ME:{
+      return {
+        ...state,
+        me:{
+          ...state.me,
+          Posts:state.me.Posts.filter(v=>v.id!==action.payload)
         }
       }
     }

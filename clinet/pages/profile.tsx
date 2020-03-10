@@ -13,11 +13,11 @@ const Profile = ()=>{
     const [editName,setEditName] = useState('');
 
     useEffect(()=>{
-        if(me){
-            dispatch(loadFollowersRequest(me.id));
-            dispatch(loadFollowingsRequest(me.id));
-            dispatch(loadUserPostRequest(me.id));
-        }
+        // if(me){
+        //     dispatch(loadFollowersRequest(me.id));
+        //     dispatch(loadFollowingsRequest(me.id));
+        //     dispatch(loadUserPostRequest(me.id));
+        // }
 
     },[me && me.id])
 
@@ -37,6 +37,14 @@ const Profile = ()=>{
         e.preventDefault();
         dispatch(editNicknameRequest(editName));
     },[editName])
+
+    const loadMoreFollowers = useCallback(()=>{
+        dispatch(loadFollowersRequest(me.id,followerList.length))
+    },[followerList && followerList.length])
+
+    const loadMoreFollowings = useCallback(()=>{
+        dispatch(loadFollowingsRequest(me.id,followingList.length));
+    },[followingList && followingList.length])
     return (
         <div>
             <Form style={{marginBottom:'20px',border:'1px solid #d9d9d9', padding:'20px'}} onSubmit={onEditNickname}>
@@ -48,7 +56,7 @@ const Profile = ()=>{
                 grid={{gutter:4,xs:2,md:3}}
                 size="small"
                 header={<div>Follower List</div>}
-                loadMore={<Button style={{width:'100%'}}>More</Button>}
+                loadMore={<Button style={{width:'100%'}} onClick={loadMoreFollowers}>More</Button>}
                 bordered
                 dataSource={followerList?followerList:[]}
                 renderItem={(item:any)=>(
@@ -64,7 +72,7 @@ const Profile = ()=>{
                 grid={{gutter:4,xs:2,md:3}}
                 size="small"
                 header={<div>Following List</div>}
-                loadMore={<Button style={{width:'100%'}}>More</Button>}
+                loadMore={<Button style={{width:'100%'}} onClick={loadMoreFollowings}>More</Button>}
                 bordered
                 dataSource={followingList?followingList:[]}
                 renderItem={(item:any)=>(
@@ -84,6 +92,18 @@ const Profile = ()=>{
             </div>
         </div>
     )
+}
+
+Profile.getInitialProps = async(context)=>{
+    // if(me){
+    //     dispatch(loadFollowersRequest(me.id));
+    //     dispatch(loadFollowingsRequest(me.id));
+    //     dispatch(loadUserPostRequest(me.id));
+    // }
+    const state = context.store.getState();
+        context.store.dispatch(loadFollowersRequest(state.user.me&&state.user.me.id))
+        context.store.dispatch(loadFollowingsRequest(state.user.me&&state.user.me.id))
+        context.store.dispatch(loadUserPostRequest(state.user.me&&state.user.me.id))
 }
 
 export default Profile;

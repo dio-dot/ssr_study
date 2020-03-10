@@ -9,9 +9,9 @@ const Home = () => {
   const { me } = useSelector((state: RootState) => state.user);
   const { mainPosts } = useSelector((state: RootState) => state.post);
   const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(loadMainPostRequest());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(loadMainPostRequest());
+  // }, []);
 
   return (
     <>
@@ -23,5 +23,10 @@ const Home = () => {
     </>
   );
 };
+
+Home.getInitialProps= async(context) =>{
+  console.log(Object.keys(context));
+  context.store.dispatch(loadMainPostRequest());
+}
 
 export default Home;

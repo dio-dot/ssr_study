@@ -8,9 +8,9 @@ const Hashtag = ({tag}) =>{
     const dispatch = useDispatch();
     const {mainPosts} = useSelector((state:RootState)=>state.post)
     
-    useEffect(()=>{
-        dispatch(loadHashtagPostRequest(tag))
-    },[])
+    // useEffect(()=>{
+    //     dispatch(loadHashtagPostRequest(tag))
+    // },[])
     return (
         <div>
         {
@@ -22,8 +22,8 @@ const Hashtag = ({tag}) =>{
     )
 }
 Hashtag.getInitialProps=async(context)=>{
-
     console.log(`hashtag getInitialProps`,context.query.tag)
+    context.store.dispatch(loadHashtagPostRequest(context.query.tag))
     return {tag:context.query.tag}
 }
 export default Hashtag

@@ -42,6 +42,10 @@ const RETWEET_REQUEST = 'RETWEET_REQUEST' as const;
 const RETWEET_SUCCESS = 'RETWEET_SUCCESS' as const;
 const RETWEET_FAILURE = 'RETWEET_FAILURE' as const;
 
+const REMOVE_POST_REQUEST = 'REMOVE_POST_REQUEST' as const;
+const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS' as const;
+const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE' as const;
+
 
 export const addPostRequest = (payload?:object)=>({type:ADD_POST_REQUEST,payload})
 export const addPostSuccess = (payload:any)=>({type:ADD_POST_SUCCESS,payload})
@@ -74,6 +78,9 @@ export const unlikePostFailure = ()=>({type:UNLIKE_POST_FAILURE})
 export const retweetRequest = (payload?:any)=>({type:RETWEET_REQUEST,payload})
 export const retweetSuccess = (payload:any)=>({type:RETWEET_SUCCESS,payload})
 export const retweetFailure = ()=>({type:RETWEET_FAILURE})
+export const removePostRequest = (payload?:any)=>({type:REMOVE_POST_REQUEST,payload})
+export const removePostSuccess = (payload?:any) => ({type:REMOVE_POST_SUCCESS,payload})
+export const removePostFailure = (payload?:any) =>({type:REMOVE_POST_FAILURE,payload})
 
 type PostAction = 
 ReturnType<typeof addCommentRequest>|
@@ -106,7 +113,10 @@ ReturnType<typeof unlikePostSuccess>|
 ReturnType<typeof unlikePostFailure>|
 ReturnType<typeof retweetRequest>|
 ReturnType<typeof retweetSuccess>|
-ReturnType<typeof retweetFailure>
+ReturnType<typeof retweetFailure>|
+ReturnType<typeof removePostRequest>|
+ReturnType<typeof removePostSuccess>|
+ReturnType<typeof removePostFailure>
 
 type PostState = {
     mainPosts:Array<Post>,
@@ -329,6 +339,22 @@ const reducer = (state:PostState = initialState,action:PostAction)=>{
             }
         }
         case RETWEET_FAILURE:{
+            return{
+                ...state
+            }
+        }
+        case REMOVE_POST_REQUEST:{
+            return{
+                ...state
+            }
+        }
+        case REMOVE_POST_SUCCESS:{
+            return{
+                ...state,
+                mainPosts:state.mainPosts.filter(v=>v.id!==action.payload)
+            }
+        }
+        case REMOVE_POST_FAILURE:{
             return{
                 ...state
             }

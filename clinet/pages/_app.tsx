@@ -1,12 +1,15 @@
 import Head from 'next/head';
 import withRedux from 'next-redux-wrapper';
+import withReduxSaga from 'next-redux-saga';
 import AppLayout from "../components/AppLayout"; 
-import { createStore, applyMiddleware } from 'redux';
-import createSagaMiddleWare from "redux-saga";
+import { createStore, applyMiddleware, Store } from 'redux';
+import createSagaMiddleWare, { Task } from "redux-saga";
 import { composeWithDevTools } from "redux-devtools-extension";
 import RootReducer from '../reducers';
 import rootSaga from '../sagas';
 import {Provider} from "react-redux";
+import { loadUserRequest } from '../reducers/user';
+import Axios from 'axios';
 
 
 const App = ({Component,store,pageProps})=>{
@@ -28,24 +31,40 @@ const App = ({Component,store,pageProps})=>{
 }
 
 App.getInitialProps = async(context)=>{
-    console.log(context);
     const {ctx} = context
     let pageProps = {};
-    if(context.Component.getInitialProps){
-       pageProps =  await context.Component.getInitialProps(ctx)
+    const cookie = ctx.isServer?ctx.req.headers.cookie:'';
+    const state = ctx.store.getState();
+    if(ctx.isServer && cookie){
+        Axios.defaults.headers.Cookie = cookie;
     }
+    if(!state.user.me){
+        ctx.store.dispatch(
+            loadUserRequest()
+        )
+    }
+
+    if(context.Component.getInitialProps){
+        pageProps =  await context.Component.getInitialProps(ctx)
+     }
+
     return {pageProps};
 }
-
-export default withRedux((initialState,options)=>{
+type TypeStore = Store & {
+    sagaTask?: Task;
+};
+  
+const configueStore = (initialState,options)=>{
     const sagaMiddleWare = createSagaMiddleWare()
     const middleware = [sagaMiddleWare];
     const composeEnhancers = composeWithDevTools({});
-    const store = createStore(
+    const store:TypeStore = createStore(
         RootReducer,
         initialState,
         composeEnhancers(applyMiddleware(...middleware))
     )
-    sagaMiddleWare.run(rootSaga);
+    store.sagaTask = sagaMiddleWare.run(rootSaga);
     return store
-})(App);
+}
+
+export default withRedux(configueStore)(withReduxSaga(App));

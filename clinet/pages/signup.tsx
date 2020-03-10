@@ -43,7 +43,9 @@ const Signup = ()=>{
             Router.push('/')
         }
     },[me && me.id])
-
+    if(me){
+        return null;
+    }
     return (
         <Form onSubmit={onSubmitForm}>
             <div>

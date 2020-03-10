@@ -10,12 +10,12 @@ import { loadUserRequest } from "../reducers/user";
 
 const AppLayout = ({children})=>{
     const {me} = useSelector((state:RootState)=>state.user);
-    const dispatch = useDispatch();
-    useEffect(()=>{
-        if(!me){
-            dispatch(loadUserRequest())
-        }
-    },[])
+    // const dispatch = useDispatch();
+    // useEffect(()=>{
+        // if(!me){
+        //     dispatch(loadUserRequest())
+        // }
+    // },[])
     return (
         <div>
             <Menu mode="horizontal">
@@ -46,5 +46,6 @@ const AppLayout = ({children})=>{
         </div>
     )
 }
+
 
 export default AppLayout

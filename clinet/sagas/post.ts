@@ -1,7 +1,7 @@
 import { all, fork, takeLatest, put ,delay,call} from "redux-saga/effects";
-import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess, retweetSuccess, retweetFailure, retweetRequest } from "../reducers/post";
+import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess, retweetSuccess, retweetFailure, retweetRequest, removePostRequest, removePostSuccess, removePostFailure } from "../reducers/post";
 import axios from "axios";
-import { addPostToMe } from "../reducers/user";
+import { addPostToMe, removePostOfMe } from "../reducers/user";
 
 function* addPost(action){
     try {
@@ -88,7 +88,7 @@ function* loadHashtagPosts(action){
 }
 
 function loadHashtagPostsAPI(hashtag){
-    return axios.get(`http://localhost:8080/api/hashtag/${hashtag}`,)
+    return axios.get(`http://localhost:8080/api/hashtag/${encodeURIComponent(hashtag)}`,)
 }
 
 function* watchLoadUserPosts(){
@@ -105,7 +105,7 @@ function* loadUserPosts(action){
 }
 
 function loadUserPostsAPI(userId){
-    return axios.get(`http://localhost:8080/api/user/${userId}/posts`,{})
+    return axios.get(`http://localhost:8080/api/user/${userId||0}/posts`,{})
 }
 
 function* watchUploadImages(){
@@ -196,6 +196,25 @@ function retweetAPI(postId){
     })    
 }
 
+function* watchRemovePost(){
+    yield takeLatest(removePostRequest().type,removePost)
+}
+
+function* removePost(action){
+    try {
+        const result = yield call(removePostAPI,action.payload)
+        yield put(removePostSuccess(result.data));
+        yield put(removePostOfMe(result.data));
+    } catch (error) {
+        yield put(removePostFailure());
+    }
+}
+
+function removePostAPI(postId){
+    return axios.delete(`http://localhost:8080/api/post/${postId}`,{
+        withCredentials:true
+    })
+}
 
 export default function* postSaga(){
     yield all([
@@ -208,6 +227,7 @@ export default function* postSaga(){
         fork(watchUploadImages),
         fork(watchLikePost),
         fork(watchUnlikePost),
-        fork(watchRetweet)
+        fork(watchRetweet),
+        fork(watchRemovePost),
     ])
 }

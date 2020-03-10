@@ -157,15 +157,15 @@ function* watchLoadFollowers() {
 
 function* loadFollowers(action) {
   try {
-    const result = yield call(loadFollowersAPI,action.payload);
+    const result = yield call(loadFollowersAPI,action.payload,action.offset);
     yield put(loadFollowersSuccess(result.data));
   } catch (error) {
     yield put(loadFollowersFailure());
   }
 }
 
-function loadFollowersAPI(userId) {
-  return axios.get(`/user/${userId}/followers`, { withCredentials: true });
+function loadFollowersAPI(userId,offset=0,limit=3) {
+  return axios.get(`/user/${userId||0}/followers?offset=${offset}&limit=${limit}`, { withCredentials: true });
 }
 
 function* watchLoadFollowings() {
@@ -174,15 +174,15 @@ function* watchLoadFollowings() {
 
 function* loadFollowings(action) {
   try {
-    const result = yield call(loadFollowingsAPI,action.payload);
+    const result = yield call(loadFollowingsAPI,action.payload,action.offset);
     yield put(loadFollowingsSuccess(result.data));
   } catch (error) {
     yield put(loadFollowingsFailure());
   }
 }
 
-function loadFollowingsAPI(userId) {
-  return axios.get(`/user/${userId}/followings`, { withCredentials: true });
+function loadFollowingsAPI(userId,offset=0,limit=3) {
+  return axios.get(`/user/${userId||0}/followings?offset=${offset}&limit=${limit}`, { withCredentials: true });
 }
 
 function* watchRemoveFollower() {

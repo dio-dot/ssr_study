@@ -10,11 +10,11 @@ const User = ({id}) =>{
     const dispatch = useDispatch();
     const {mainPosts} = useSelector((state:RootState)=>state.post)
     const {userInfo} = useSelector((state:RootState)=>state.user)
-    useEffect(()=>{
-      console.log(mainPosts);
-        dispatch(loadUserRequest(id))
-        dispatch(loadUserPostRequest(id))
-    },[])
+    // useEffect(()=>{
+    //   console.log(mainPosts);
+    //     dispatch(loadUserRequest(id))
+    //     dispatch(loadUserPostRequest(id))
+    // },[])
     return (
         <div>
         {
@@ -55,6 +55,13 @@ const User = ({id}) =>{
 }
 User.getInitialProps=async(context)=>{
     console.log(`User getInitialProps`,context.query.id)
+        // useEffect(()=>{
+    //   console.log(mainPosts);
+    //     dispatch(loadUserRequest(id))
+    //     dispatch(loadUserPostRequest(id))
+    // },[])
+    context.store.dispatch(loadUserRequest(context.query.id))
+    context.store.dispatch(loadUserPostRequest(context.query.id))
     return {id:parseInt(context.query.id,10)}
 }
 export default User
