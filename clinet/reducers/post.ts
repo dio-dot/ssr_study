@@ -53,7 +53,7 @@ export const addPostFailure = (payload:string)=>({type:ADD_POST_FAILURE,payload}
 export const addCommentRequest = (payload?:any)=>({type:ADD_COMMENT_REQUEST,payload})
 export const addCommentSuccess = (payload:any)=>({type:ADD_COMMENT_SUCCESS,payload})
 export const addCommentFailure = (payload:string)=>({type:ADD_COMMENT_FAILURE,payload})
-export const loadMainPostRequest = ()=>({type:LOAD_MAIN_POST_REQUEST});
+export const loadMainPostRequest = (payload?:any)=>({type:LOAD_MAIN_POST_REQUEST,payload});
 export const loadMainPostSuccess = (payload:any)=>({type:LOAD_MAIN_POST_SUCCESS,payload})
 export const loadMainPostFailure = ()=>({type:LOAD_MINA_POST_FAILURE})
 export const loadHashtagPostRequest = (payload?:string)=>({type:LOAD_HASHTAG_POST_REQUEST,payload})
@@ -127,6 +127,7 @@ type PostState = {
     addCommentErrorReason:string,
     addingComment:boolean,
     addedComment:boolean,
+    hasMorePost:boolean,
 }
 
 const initialState:PostState = {
@@ -138,6 +139,7 @@ const initialState:PostState = {
     addedComment:false,
     mainPosts:[],
     imagePaths:[],
+    hasMorePost:false,
 }
 
 const reducer = (state:PostState = initialState,action:PostAction)=>{
@@ -197,13 +199,16 @@ const reducer = (state:PostState = initialState,action:PostAction)=>{
         }
         case LOAD_MAIN_POST_REQUEST:{
             return{
-                ...state
+                ...state,
+                mainPosts:action.payload===0?[]:state.mainPosts,
+                hasMorePost:action.payload? state.hasMorePost :true,
             }
         }
         case LOAD_MAIN_POST_SUCCESS:{
             return{
                 ...state,
-                mainPosts:action.payload
+                mainPosts:state.mainPosts.concat(action.payload),
+                hasMorePost:action.payload.length===10
             }
         }
         case LOAD_MINA_POST_FAILURE:{

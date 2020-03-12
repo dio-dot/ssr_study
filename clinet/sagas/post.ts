@@ -1,4 +1,4 @@
-import { all, fork, takeLatest, put ,delay,call} from "redux-saga/effects";
+import { all, fork, takeLatest, put ,delay,call, throttle} from "redux-saga/effects";
 import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess, retweetSuccess, retweetFailure, retweetRequest, removePostRequest, removePostSuccess, removePostFailure } from "../reducers/post";
 import axios from "axios";
 import { addPostToMe, removePostOfMe } from "../reducers/user";
@@ -58,20 +58,20 @@ function loadCommentsAPI(id){
 }
 
 function* watchLoadPosts(){
-    yield takeLatest(loadMainPostRequest().type,loadMainPosts);
+    yield throttle(2000,loadMainPostRequest().type,loadMainPosts);
 }
 
-function* loadMainPosts(){
+function* loadMainPosts(action){
     try {
-        const result = yield call(loadMainPostAPI)
+        const result = yield call(loadMainPostAPI,action.payload)
         yield put(loadMainPostSuccess(result.data));
     } catch (error) {
         yield put(loadMainPostFailure())
     }
 }
 
-function loadMainPostAPI(){
-    return axios.get('http://localhost:8080/api/posts');
+function loadMainPostAPI(lastId=0,limit=10){
+    return axios.get(`http://localhost:8080/api/posts?lastId=${lastId}&limit=${limit}`);
 }
 
 function* watchLoadHashtagPosts(){
@@ -87,11 +87,11 @@ function* loadHashtagPosts(action){
     }
 }
 
-function loadHashtagPostsAPI(hashtag){
+function loadHashtagPostsAPI(hashtag){//lastId 적용해야됨
     return axios.get(`http://localhost:8080/api/hashtag/${encodeURIComponent(hashtag)}`,)
 }
 
-function* watchLoadUserPosts(){
+function* watchLoadUserPosts(){//lastId 적용해야됨
     yield takeLatest(loadUserPostRequest().type,loadUserPosts)
 }
 
