@@ -1,5 +1,5 @@
 import { all, fork, takeLatest, put ,delay,call, throttle} from "redux-saga/effects";
-import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess, retweetSuccess, retweetFailure, retweetRequest, removePostRequest, removePostSuccess, removePostFailure } from "../reducers/post";
+import { addPostRequest, addPostSuccess, addPostFailure, addCommentRequest, addCommentSuccess, addCommentFailure, loadMainPostRequest, loadMainPostFailure, loadMainPostSuccess, loadHashtagPostRequest, loadHashtagPostSuccess, loadHashtagPostFailure, loadUserPostSuccess, loadUserPostFailure, loadUserPostRequest, loadCommentsRequest, loadCommentsFailure, loadCommentsSuccess, uploadImagesRequest, uploadImagesFailure, uploadImagesSuccess, likePostSuccess, likePostRequest, likePostFailure, unlikePostRequest, unlikePostFailure, unlikePostSuccess, retweetSuccess, retweetFailure, retweetRequest, removePostRequest, removePostSuccess, removePostFailure, loadPostRequest, loadPostSuccess, loadPostFailure } from "../reducers/post";
 import axios from "axios";
 import { addPostToMe, removePostOfMe } from "../reducers/user";
 
@@ -72,6 +72,22 @@ function* loadMainPosts(action){
 
 function loadMainPostAPI(lastId=0,limit=10){
     return axios.get(`http://localhost:8080/api/posts?lastId=${lastId}&limit=${limit}`);
+}
+function* watchLoadPost(){
+    yield takeLatest(loadPostRequest().type,loadPost);
+}
+
+function* loadPost(action){
+    try {
+        const result = yield call(loadPostAPI,action.payload)
+        yield put(loadPostSuccess(result.data));
+    } catch (error) {
+        yield put(loadPostFailure())
+    }
+}
+
+function loadPostAPI(postId){
+    return axios.get(`http://localhost:8080/api/post/${postId}`);
 }
 
 function* watchLoadHashtagPosts(){
@@ -229,5 +245,6 @@ export default function* postSaga(){
         fork(watchUnlikePost),
         fork(watchRetweet),
         fork(watchRemovePost),
+        fork(watchLoadPost),
     ])
 }

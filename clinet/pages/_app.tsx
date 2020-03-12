@@ -10,19 +10,42 @@ import rootSaga from '../sagas';
 import {Provider} from "react-redux";
 import { loadUserRequest } from '../reducers/user';
 import Axios from 'axios';
+import Helmet from 'react-helmet';
 
 
 const App = ({Component,store,pageProps})=>{
     return (
         <Provider store={store}>
-            <Head>
+            <Helmet
+                title="NodeBird"
+                htmlAttributes={{lang:'ko'}}
+                meta={[{
+                    charset:'UTF-8'
+                },{
+                    name:'viewport' , content:"width=device-width,minimum-scale=1,initial-scale=1"
+                },{
+                    'http-equiv':'X-UA-Compatible', content:'IE=edge'
+                }]}
+                link={[
+                    {
+                    rel:'stylesheet',href:"https://cdnjs.cloudflare.com/ajax/libs/antd/3.26.7/antd.min.css"
+                },
+                    {
+                    rel:'stylesheet',href:"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
+                },
+                {
+                    rel:'stylesheet',href:"https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
+                }
+            ]}
+            />
+            {/* <Head>
                 <link
                 rel="stylesheet"
                 href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.26.7/antd.min.css"
                 ></link>
                 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" />
 <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" />
-            </Head>
+            </Head> */}
             <AppLayout>
                 <Component {...pageProps}/>
             </AppLayout>
