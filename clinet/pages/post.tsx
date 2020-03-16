@@ -7,7 +7,7 @@ const Post = ({ id }) => {
   const {singlePost} = useSelector((state: RootState) => state.post);
   return (
     <>
-        <Helmet tittle = {`${singlePost.User.nickname} 의글`}
+        <Helmet title = {`${singlePost.User.nickname} 의글`}
                 description = {`${singlePost.content}`}
                 meta ={[{
                     name:'description',content:singlePost.content 

@@ -16,6 +16,7 @@ import Item from "antd/lib/list/Item";
 import PostImages from "./PostIamges";
 import PostCardContent from "./PostCardContent";
 import { followRequest, unfollowRequest } from "../reducers/user";
+import styled from 'styled-components';
 // interface PostCardProps {
 //   post: Post;
 // }
@@ -32,6 +33,10 @@ import { followRequest, unfollowRequest } from "../reducers/user";
 //     "nickname": "jinseok"
 //   }
 // }
+const CardWrapper = styled.div`
+  margin-bottom:20px;
+`
+
 const PostCard = ({ post }) => {
   const [commentForm, setCommentForm] = useState(false);
   const [comment, onChangeComment] = useInput("");
@@ -83,7 +88,7 @@ const PostCard = ({ post }) => {
   },[])
 
   return (
-    <div>
+    <CardWrapper>
       <Card
         key={post.createdAt}
         // cover={post.Images[0] && <img alt="example" src={`http://localhost:8080/${post.Images[0].src}`} />}
@@ -200,7 +205,7 @@ const PostCard = ({ post }) => {
           />
         </>
       )}
-    </div>
+    </CardWrapper>
   );
 };
 export default PostCard;

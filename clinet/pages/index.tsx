@@ -45,7 +45,6 @@ const Home = () => {
 };
 
 Home.getInitialProps= async(context) =>{
-  console.log(Object.keys(context));
   context.store.dispatch(loadMainPostRequest());
 }
 
